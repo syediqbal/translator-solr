@@ -39,7 +39,7 @@ public class SolrExecutionFactory extends
 	public ResultSetExecution createResultSetExecution(QueryExpression command,
 			ExecutionContext executionContext, RuntimeMetadata metadata,
 			SolrConnection connection) throws TranslatorException {
-		return new SolrQueryExecution((Select) command, executionContext, metadata, connection);
+		return new SolrQueryExecution( command, executionContext, metadata, connection);
 	}
 
 /*	@Override

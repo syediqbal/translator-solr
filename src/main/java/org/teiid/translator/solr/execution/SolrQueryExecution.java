@@ -1,6 +1,7 @@
 package org.teiid.translator.solr.execution;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.resource.cci.ResultSet;
@@ -8,7 +9,9 @@ import javax.resource.cci.ResultSet;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.teiid.language.QueryExpression;
 import org.teiid.language.Select;
 import org.teiid.logging.LogManager;
 import org.teiid.metadata.RuntimeMetadata;
@@ -30,17 +33,19 @@ public class SolrQueryExecution implements ResultSetExecution {
 	private SolrQuery params = new SolrQuery();
 	private QueryResponse queryResponse = null;
 	private String[] fieldList = null;
-	private SolrDocumentList docs;
+	private Iterator<SolrDocument> docItr;
 	private int docNum = 0;
 	private int docIndex = 0;
+	private Class<?>[] expectedTypes;
 
-	public SolrQueryExecution(Select command,
+	public SolrQueryExecution( QueryExpression command,
 			ExecutionContext executionContext, RuntimeMetadata metadata,
 			SolrConnection connection) {
 		this.metadata = metadata;
-		this.query = command;
+		this.query = (Select) command;
 		this.executionContext = executionContext;
 		this.connection = connection;
+		this.expectedTypes = command.getColumnTypes();
 	}
 
 	@Override
@@ -83,9 +88,11 @@ public class SolrQueryExecution implements ResultSetExecution {
 		// execute query and somewhere in here do translation
 		queryResponse = connection.executeQuery(params);
 
-//		docs = queryResponse.getResults(); //change to iterator? how does iterator work?
+		docItr = queryResponse.getResults().iterator(); // change to iterator?
+														// how does iterator
+														// work?
 
-		docNum = (int) docs.getNumFound();
+		// docNum = (int) docs.getNumFound();
 
 		/*
 		 * TODO write logic to handle limiting the number of docs found
@@ -98,19 +105,18 @@ public class SolrQueryExecution implements ResultSetExecution {
 	@Override
 	public List<?> next() throws TranslatorException, DataNotAvailableException {
 
-		final List<Object> values = new ArrayList<Object>();
+		final List<Object> row = new ArrayList<Object>();
 
-		if (docIndex < docNum) {
+		if (this.docItr != null && this.docItr.hasNext()) {
 			// iterate through columns
-			for (String field : fieldList) {
-				 //TODO map doc field values to metadata space 
+			SolrDocument doc = this.docItr.next();
+			for (int i=0; i < this.visitor.getFieldNameList().length; i++) {
+				// TODO map doc field values to metadata space
 			}
-			
-			docIndex = docIndex + 1;
-			return values;
-		} else {
-			return null;
+
+			return row;
 		}
+		return null;
 	}
 
 }
