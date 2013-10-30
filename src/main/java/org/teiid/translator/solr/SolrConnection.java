@@ -10,10 +10,5 @@ public interface SolrConnection extends Connection{
 		 * Executes a Solr query.
 		 * */
 		public QueryResponse executeQuery(SolrQuery params);
-		
-		/**
-		 * Returns metadata about Cassandra keyspace (column families, columns metadata etc.)
-		 * */
-		//public KeyspaceMetadata keyspaceInfo();
-		
+			
 }

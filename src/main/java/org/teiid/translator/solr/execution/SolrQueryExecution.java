@@ -1,5 +1,6 @@
 package org.teiid.translator.solr.execution;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.resource.cci.ResultSet;
@@ -7,6 +8,7 @@ import javax.resource.cci.ResultSet;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.teiid.language.Select;
 import org.teiid.logging.LogManager;
 import org.teiid.metadata.RuntimeMetadata;
@@ -28,7 +30,9 @@ public class SolrQueryExecution implements ResultSetExecution {
 	private SolrQuery params = new SolrQuery();
 	private QueryResponse queryResponse = null;
 	private String[] fieldList = null;
-	
+	private SolrDocumentList docs;
+	private int docNum = 0;
+	private int docIndex = 0;
 
 	public SolrQueryExecution(Select command,
 			ExecutionContext executionContext, RuntimeMetadata metadata,
@@ -53,41 +57,60 @@ public class SolrQueryExecution implements ResultSetExecution {
 
 	@Override
 	public void execute() throws TranslatorException {
-		visitor = new SolrSQLHierarchyVistor(metadata,logger);
-		//visitor.translateSQL(query);
-		//build query in solr instance
-		//setQuery
-			//set query order
-			//sort clause
-			//setFields
-		
-		//traverse commands
+		visitor = new SolrSQLHierarchyVistor(metadata, logger);
+		// visitor.translateSQL(query);
+		// build query in solr instance
+		// setQuery
+		// set query order
+		// sort clause
+		// setFields
+
+		// traverse commands
 		visitor.visitNode(query);
-		
-		//get query fields
-		fieldList  = visitor.getFieldNameList();		
-		
-		//add query fields
-		for(String field : fieldList){
-			params.addField(field);			
+
+		// get query fields
+		fieldList = visitor.getFieldNameList();
+
+		// add query fields
+		for (String field : fieldList) {
+			params.addField(field);
 		}
-		
-		//TODO set offset
-		//TODO set row result limit
+
+		// TODO set offset
+		// TODO set row result limit
 		//
-		
-		
-		
-		
-		//execute query and somewhere in here do translation
+
+		// execute query and somewhere in here do translation
 		queryResponse = connection.executeQuery(params);
-		
+
+//		docs = queryResponse.getResults(); //change to iterator? how does iterator work?
+
+		docNum = (int) docs.getNumFound();
+
+		/*
+		 * TODO write logic to handle limiting the number of docs found
+		 * logger.logDetail("Total docs returned: " + numFound); if(initialLimit
+		 * != -1 && initialLimit < numFound) { numToRetrieve = initialLimit; }
+		 * else { numToRetrieve = numFound; }
+		 */
 	}
 
 	@Override
 	public List<?> next() throws TranslatorException, DataNotAvailableException {
-		// TODO Auto-generated method stub
-		return null;
+
+		final List<Object> values = new ArrayList<Object>();
+
+		if (docIndex < docNum) {
+			// iterate through columns
+			for (String field : fieldList) {
+				 //TODO map doc field values to metadata space 
+			}
+			
+			docIndex = docIndex + 1;
+			return values;
+		} else {
+			return null;
+		}
 	}
 
 }
