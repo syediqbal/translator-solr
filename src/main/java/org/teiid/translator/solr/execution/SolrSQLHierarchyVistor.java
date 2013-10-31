@@ -18,11 +18,10 @@ import org.teiid.metadata.RuntimeMetadata;
 public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 
 	private RuntimeMetadata metadata;
-	private LogManager logger;
-	protected StringBuilder buffer = new StringBuilder();
 	protected static final String UNDEFINED = "<undefined>"; //$NON-NLS-1$
 
 	String[] fieldNameList;
+	private LogManager logger;
 
 	public SolrSQLHierarchyVistor(RuntimeMetadata metadata, LogManager logger) {
 		this.metadata = metadata;
@@ -54,10 +53,6 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 
 	public String[] getFieldNameList() {
 		return fieldNameList;
-	}
-
-	public String getTranslatedSQL(LanguageObject obj) {
-		return buffer.toString();
 	}
 
 	@Override
@@ -100,22 +95,9 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 
 	}
 
-	/**
-	 * Appends the string form of the LanguageObject to the current buffer.
-	 * 
-	 * @param obj
-	 *            the language object instance
-	 */
-	public void append(LanguageObject obj) {
-		if (obj == null) {
-			buffer.append(UNDEFINED);
-		} else {
-			visitNode(obj);
-		}
-	}
-
 	public String getFieldName(int i) {
 		return fieldNameList[i].toString();
 
 	}
+
 }
