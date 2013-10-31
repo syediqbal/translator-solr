@@ -24,8 +24,6 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 
 	String[] fieldNameList;
 
-
-
 	public SolrSQLHierarchyVistor(RuntimeMetadata metadata, LogManager logger) {
 		this.metadata = metadata;
 		this.logger = logger;
@@ -49,14 +47,15 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 			// }
 			// }
 		}
-		
+
 		fieldNameList = obj.getColumnNames();
 
 	}
-	
+
 	public String[] getFieldNameList() {
 		return fieldNameList;
 	}
+
 	public String getTranslatedSQL(LanguageObject obj) {
 		return buffer.toString();
 	}
@@ -113,5 +112,10 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 		} else {
 			visitNode(obj);
 		}
+	}
+
+	public String getFieldName(int i) {
+		return fieldNameList[i].toString();
+
 	}
 }

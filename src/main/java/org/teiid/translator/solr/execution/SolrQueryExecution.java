@@ -20,6 +20,7 @@ import org.teiid.translator.ExecutionContext;
 import org.teiid.translator.ResultSetExecution;
 import org.teiid.translator.TranslatorException;
 import org.teiid.translator.solr.SolrConnection;
+import org.teiid.translator.solr.SolrExecutionFactory;
 
 public class SolrQueryExecution implements ResultSetExecution {
 
@@ -37,8 +38,9 @@ public class SolrQueryExecution implements ResultSetExecution {
 	private int docNum = 0;
 	private int docIndex = 0;
 	private Class<?>[] expectedTypes;
+	private SolrExecutionFactory executionFactory;
 
-	public SolrQueryExecution( QueryExpression command,
+	public SolrQueryExecution(QueryExpression command,
 			ExecutionContext executionContext, RuntimeMetadata metadata,
 			SolrConnection connection) {
 		this.metadata = metadata;
@@ -46,6 +48,7 @@ public class SolrQueryExecution implements ResultSetExecution {
 		this.executionContext = executionContext;
 		this.connection = connection;
 		this.expectedTypes = command.getColumnTypes();
+
 	}
 
 	@Override
@@ -102,21 +105,28 @@ public class SolrQueryExecution implements ResultSetExecution {
 		 */
 	}
 
+	/* This iterates through the documents from Solr and maps their fields to rows in the Teiid table
+	 * @see org.teiid.translator.ResultSetExecution#next()
+	 */
 	@Override
 	public List<?> next() throws TranslatorException, DataNotAvailableException {
 
 		final List<Object> row = new ArrayList<Object>();
-
+		String columnName; 
+		
+		//is there any solr docs
 		if (this.docItr != null && this.docItr.hasNext()) {
-			// iterate through columns
+			
 			SolrDocument doc = this.docItr.next();
-			for (int i=0; i < this.visitor.getFieldNameList().length; i++) {
-				// TODO map doc field values to metadata space
+			
+			for (int i=0; i < this.visitor.fieldNameList.length; i++) {
+				columnName = this.visitor.getFieldName(i);
+				
+				row.add(this.executionFactory.convertToTeiid(doc.getFieldValue(columnName), this.expectedTypes[i]));
 			}
 
 			return row;
 		}
 		return null;
 	}
-
 }
