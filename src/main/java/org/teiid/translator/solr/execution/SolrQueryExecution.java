@@ -11,6 +11,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.teiid.language.DerivedColumn;
 import org.teiid.language.QueryExpression;
 import org.teiid.language.Select;
 import org.teiid.logging.LogManager;
@@ -33,7 +34,7 @@ public class SolrQueryExecution implements ResultSetExecution {
 	private LogManager logger;
 	private SolrQuery params = new SolrQuery();
 	private QueryResponse queryResponse = null;
-	private String[] fieldList = null;
+	private List<DerivedColumn> fieldList = null;
 	private Iterator<SolrDocument> docItr;
 	private int docNum = 0;
 	private int docIndex = 0;
@@ -65,7 +66,7 @@ public class SolrQueryExecution implements ResultSetExecution {
 
 	@Override
 	public void execute() throws TranslatorException {
-		visitor = new SolrSQLHierarchyVistor(metadata, logger);
+		this.visitor = new SolrSQLHierarchyVistor(metadata);
 		// visitor.translateSQL(query);
 		// build query in solr instance
 		// setQuery
@@ -74,14 +75,14 @@ public class SolrQueryExecution implements ResultSetExecution {
 		// setFields
 
 		// traverse commands
-		visitor.visitNode(query);
+		this.visitor.visitNode(query);
 
 		// get query fields
-		fieldList = visitor.getFieldNameList();
+		fieldList = this.visitor.getFieldNameList();
 
 		// add query fields
-		for (String field : fieldList) {
-			params.addField(field);
+		for (DerivedColumn field : fieldList) {
+			params.addField(field.toString());
 		}
 
 		// TODO set offset
@@ -119,8 +120,8 @@ public class SolrQueryExecution implements ResultSetExecution {
 			
 			SolrDocument doc = this.docItr.next();
 			
-			for (int i=0; i < this.visitor.fieldNameList.length; i++) {
-				columnName = this.visitor.getFieldName(i);
+			for (int i=0; i < this.visitor.fieldNameList.size(); i++) {
+				columnName = this.visitor.getShortFieldName(i);
 				
 				row.add(this.executionFactory.convertToTeiid(doc.getFieldValue(columnName), this.expectedTypes[i]));
 			}

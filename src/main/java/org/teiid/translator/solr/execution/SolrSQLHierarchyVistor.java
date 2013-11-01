@@ -2,7 +2,9 @@ package org.teiid.translator.solr.execution;
 
 import java.util.List;
 
+
 import org.teiid.language.Comparison;
+import org.teiid.language.DerivedColumn;
 import org.teiid.language.Expression;
 import org.teiid.language.In;
 import org.teiid.language.LanguageObject;
@@ -20,12 +22,11 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 	private RuntimeMetadata metadata;
 	protected static final String UNDEFINED = "<undefined>"; //$NON-NLS-1$
 
-	String[] fieldNameList;
-	private LogManager logger;
+	List<DerivedColumn> fieldNameList;
+//	private LogManager logger;
 
-	public SolrSQLHierarchyVistor(RuntimeMetadata metadata, LogManager logger) {
+	public SolrSQLHierarchyVistor(RuntimeMetadata metadata) {
 		this.metadata = metadata;
-		this.logger = logger;
 
 	}
 
@@ -35,7 +36,7 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 		super.visit(obj);
 		if (obj.getFrom() != null && !obj.getFrom().isEmpty()) {
 			NamedTable table = (NamedTable) obj.getFrom().get(0);
-
+			System.out.println(table); //testing
 			// //check if select all case
 			// if(table.getMetadataObject().getColumns() != null){
 			// if (obj.getDerivedColumns().size() ==
@@ -47,11 +48,24 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 			// }
 		}
 
-		fieldNameList = obj.getColumnNames();
-
+		fieldNameList = obj.getDerivedColumns();
+//		System.out.println(obj.getDerivedColumns()); //testing
 	}
 
-	public String[] getFieldNameList() {
+	  /** 
+     * @param elementName
+     * @return
+     * @since 4.3
+     */
+    public static String getShortName(String elementName) {
+        int lastDot = elementName.lastIndexOf("."); //$NON-NLS-1$
+        if(lastDot >= 0) {
+            elementName = elementName.substring(lastDot+1);                
+        } 
+        return elementName;
+    }
+    
+	public List<DerivedColumn> getFieldNameList() {
 		return fieldNameList;
 	}
 
@@ -95,9 +109,14 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 
 	}
 
-	public String getFieldName(int i) {
-		return fieldNameList[i].toString();
+	public String getShortFieldName(int i) {
+		return getShortName(fieldNameList.get(i).toString());
 
 	}
 
+
+	public String getFullFieldName(int i) {
+		return fieldNameList.get(i).toString();
+
+	}
 }
