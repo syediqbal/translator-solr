@@ -159,6 +159,13 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
         }
     }
     
+	public String getTranslatedSQL() {
+		if(buffer == null || buffer.length()==0) {
+			return "*:*";
+		} else {
+			return buffer.toString();
+		}
+	}
 //    /**
 //     * Simple utility to append a list of language objects to the current buffer
 //     * by creating a comma-separated list.

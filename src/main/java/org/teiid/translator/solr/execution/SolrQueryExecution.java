@@ -79,17 +79,22 @@ public class SolrQueryExecution implements ResultSetExecution {
 		this.visitor.visitNode(query);
 
 		// get query fields
-		//fieldList = this.visitor.getFieldNameList();
+		// fieldList = this.visitor.getFieldNameList();
 
-//		// add query fields
-//		for (DerivedColumn field : fieldList) {
-//			params.addField(this.visitor.getShortName((field.toString())));
-//		}
-
+		// add query Solr response fields
+		for (DerivedColumn field : fieldList) {
+			params.addField(this.visitor.getShortName((field.toString())));
+		}
+		
+		//set Solr Query
+		
+		params.setQuery(this.visitor.getTranslatedSQL());
+		
+		LogManager.logInfo("This is the solr query", params.getQuery());
 		// TODO set offset
 		// TODO set row result limit
 		//
-
+		
 		// execute query and somewhere in here do translation
 		queryResponse = connection.executeQuery(params);
 
@@ -107,25 +112,29 @@ public class SolrQueryExecution implements ResultSetExecution {
 		 */
 	}
 
-	/* This iterates through the documents from Solr and maps their fields to rows in the Teiid table
+	/*
+	 * This iterates through the documents from Solr and maps their fields to
+	 * rows in the Teiid table
+	 * 
 	 * @see org.teiid.translator.ResultSetExecution#next()
 	 */
 	@Override
 	public List<?> next() throws TranslatorException, DataNotAvailableException {
 
 		final List<Object> row = new ArrayList<Object>();
-		String columnName; 
-		
-		//is there any solr docs
+		String columnName;
+
+		// is there any solr docs
 		if (this.docItr != null && this.docItr.hasNext()) {
-			
+
 			SolrDocument doc = this.docItr.next();
-			
-			for (int i=0; i < this.visitor.fieldNameList.size(); i++) {
-				//TODO handle multiple tables
+
+			for (int i = 0; i < this.visitor.fieldNameList.size(); i++) {
+				// TODO handle multiple tables
 				columnName = this.visitor.getShortFieldName(i);
-				
-				row.add(this.executionFactory.convertToTeiid(doc.getFieldValue(columnName), this.expectedTypes[i]));
+
+				row.add(this.executionFactory.convertToTeiid(
+						doc.getFieldValue(columnName), this.expectedTypes[i]));
 			}
 
 			return row;
