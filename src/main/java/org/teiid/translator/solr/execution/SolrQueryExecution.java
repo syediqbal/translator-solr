@@ -64,6 +64,7 @@ public class SolrQueryExecution implements ResultSetExecution {
 
 	}
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void execute() throws TranslatorException {
 		this.visitor = new SolrSQLHierarchyVistor(metadata);
@@ -78,12 +79,12 @@ public class SolrQueryExecution implements ResultSetExecution {
 		this.visitor.visitNode(query);
 
 		// get query fields
-		fieldList = this.visitor.getFieldNameList();
+		//fieldList = this.visitor.getFieldNameList();
 
-		// add query fields
-		for (DerivedColumn field : fieldList) {
-			params.addField(field.toString());
-		}
+//		// add query fields
+//		for (DerivedColumn field : fieldList) {
+//			params.addField(this.visitor.getShortName((field.toString())));
+//		}
 
 		// TODO set offset
 		// TODO set row result limit
@@ -121,6 +122,7 @@ public class SolrQueryExecution implements ResultSetExecution {
 			SolrDocument doc = this.docItr.next();
 			
 			for (int i=0; i < this.visitor.fieldNameList.size(); i++) {
+				//TODO handle multiple tables
 				columnName = this.visitor.getShortFieldName(i);
 				
 				row.add(this.executionFactory.convertToTeiid(doc.getFieldValue(columnName), this.expectedTypes[i]));

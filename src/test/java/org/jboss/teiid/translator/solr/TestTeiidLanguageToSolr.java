@@ -58,13 +58,14 @@ public class TestTeiidLanguageToSolr {
 //	}
 
 	
-	private void testTranslation(String sql, String expectedSolr) throws IOException, Exception{
+	private void testTranslation(String sql, String expectedSolrOutput) throws IOException, Exception{
 		Select select = (Select)getCommand(sql);
 		
 		SolrSQLHierarchyVistor visitor = new SolrSQLHierarchyVistor(this.utility.createRuntimeMetadata());
-		visitor.visitNode(select);
-		System.out.println(visitor.getShortFieldName(0));
-		//Assert.assertEquals(expectedCQL, visitor.getTranslatedSQL());
+//		System.out.println(visitor.getParams().getFields());
+		visitor.visitNode(select);		
+		Assert.assertEquals(expectedSolrOutput, visitor.getParams().getFields());
+
 	}
 	
 
@@ -76,18 +77,46 @@ public class TestTeiidLanguageToSolr {
 	} 
 
 	@Test
-	public void testSelect() throws Exception {
+	public void testSelectColumns() throws Exception {
 		
-		  testTranslation("select * from example", "SELECT price, weight, popularity from example");
-//		  testTranslation("select name,age from Person",
-//		  "SELECT name, age FROM Person");
-//		  testTranslation("select * from Person", "SELECT * FROM Person");
-//		  testTranslation("select count(*) from Person limit 10",
-//		  "SELECT COUNT(*) FROM Person LIMIT 10"); testTranslation(
-//		  "select * from Person where id=1 and age>=18 and age<=100",
-//		 "SELECT * FROM Person WHERE id = 1 AND age >= 18 AND age <= 100");
-//		  testTranslation("select * from Person where id in(1,2,3)",
-//		  "SELECT * FROM Person WHERE id IN (1, 2, 3)");
+		  
+		//column test, all columns translates to price, weight and popularity
+		  testTranslation("select * from example", "price,weight,popularity");
+		  testTranslation("select price from example", "price");
+		  
+		  //test multi-tables columns
+		  //testTranslation(sql, expectedSolrOutput);
 		 
+	}
+	@Test
+	public void testSelectFrom() throws Exception {}
+	@Test
+	public void testSelectFromJoin() throws Exception {}
+	@Test
+	public void testSelectWhen() throws Exception {}
+	@Test
+	public void testSelectWhenOr() throws Exception {}
+	@Test
+	public void testSelectWhenLike() throws Exception {}
+	@Test
+	public void testSelectWhenNot() throws Exception {}
+	@Test
+	public void testSelectWhenIn() throws Exception {}
+	@Test
+	public void testSelectWhenAndOr() throws Exception {}
+	@Test
+	public void testSelectWhenAnd() throws Exception {}
+	@Test
+	public void testSelectGroupBy() throws Exception {}
+	@Test
+	public void testSelectWhenOrderBy() throws Exception {}
+	@Test
+	public void testSelectWhenComparison() throws Exception {
+//		=
+//		<
+//		>
+//		<=
+//		>=
+//		!=
 	}
 }
