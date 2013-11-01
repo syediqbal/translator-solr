@@ -17,12 +17,14 @@ import org.teiid.query.metadata.SystemMetadata;
 import org.teiid.query.metadata.TransformationMetadata;
 import org.teiid.query.unittest.RealMetadataFactory;
 import org.teiid.translator.TypeFacility;
+import org.teiid.translator.solr.SolrExecutionFactory;
 import org.teiid.translator.solr.execution.SolrSQLHierarchyVistor;
+
 
 @SuppressWarnings("nls")
 public class TestTeiidLanguageToSolr {
-
-	private QueryMetadataInterface solrMetadata(String ddl, String vdbName, String modelName) throws Exception {
+	
+	private QueryMetadataInterface setUp(String ddl, String vdbName, String modelName) throws Exception {
 
 		MetadataFactory mf = new MetadataFactory("", 1, "", SystemMetadata.getInstance().getRuntimeTypeMap(), new Properties(), "");
 		createFakeMetadata(mf);
@@ -61,7 +63,7 @@ public class TestTeiidLanguageToSolr {
 	@Test
 	public void testSelect() throws Exception {
 		
-		  testTranslation("select * from example", "SELECT price, weight, popularity FROM example");
+		  testTranslation("select * from example", "SELECT price, weight, popularity from example");
 //		  testTranslation("select name,age from Person",
 //		  "SELECT name, age FROM Person");
 //		  testTranslation("select * from Person", "SELECT * FROM Person");
