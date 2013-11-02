@@ -22,6 +22,7 @@ import org.teiid.query.metadata.TransformationMetadata;
 import org.teiid.query.unittest.RealMetadataFactory;
 import org.teiid.translator.TypeFacility;
 import org.teiid.translator.solr.SolrExecutionFactory;
+import org.teiid.translator.solr.execution.SolrQueryExecution;
 import org.teiid.translator.solr.execution.SolrSQLHierarchyVistor;
 import org.teiid.cdk.api.TranslationUtility;
 
@@ -58,13 +59,14 @@ public class TestTeiidLanguageToSolr {
 //	}
 
 	
-	private void testTranslation(String sql, String expectedSolrOutput) throws IOException, Exception{
+	private String getTranslation(String sql) throws IOException, Exception{
 		Select select = (Select)getCommand(sql);
-		
 		SolrSQLHierarchyVistor visitor = new SolrSQLHierarchyVistor(this.utility.createRuntimeMetadata());
-//		System.out.println(visitor.getParams().getFields());
+
 		visitor.visitNode(select);		
-		Assert.assertEquals(expectedSolrOutput, visitor.getParams().getFields());
+		System.out.println(visitor.getTranslatedSQL());		
+//		Assert.assertEquals(expectedSolrOutput, visitor.getParams().getFields());
+		return visitor.getTranslatedSQL();
 
 	}
 	
@@ -81,7 +83,8 @@ public class TestTeiidLanguageToSolr {
 		
 		  
 		//column test, all columns translates to price, weight and popularity
-		  testTranslation("select * from example", "price,weight,popularity");
+		//Assert.assertEquals(expectedSolrOutput, visitor.getParams().getFields());  
+		Assert.assertEquals(getTranslation("select * from example"), "*:*");
 		  testTranslation("select price from example", "price");
 		  
 		  //test multi-tables columns

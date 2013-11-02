@@ -57,19 +57,18 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 			// }
 		}
 
-		//if there isn't a where clause then get everything
-		if(obj.getWhere() == null){
-			buffer.append("*:*");
-		}
+//		//if there isn't a where clause then get everything
+//		if(obj.getWhere() == null){
+//			buffer.append("*:*");
+//		}
 		
 		fieldNameList = obj.getDerivedColumns();
 		// System.out.println(obj.getDerivedColumns()); //testing
 		// add query fields
-		for (DerivedColumn field : fieldNameList) {
-			params.setFields(getShortName(field.toString()));
-			// System.out.println(params.getFields());
-		}
-		System.out.println(params.getQuery());
+//		for (DerivedColumn field : fieldNameList) {
+//			params.setFields(getShortName(field.toString()));
+//			// System.out.println(params.getFields());
+//		}
 	}
 
 	/**
@@ -141,23 +140,6 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 		return fieldNameList.get(i).toString();
 
 	}
-
-	public SolrQuery getParams() {
-		// System.out.println(this.params.getFields());
-		return this.params;
-	}
-	  
-    /**
-     * Appends the string form of the LanguageObject to the current buffer.
-     * @param obj the language object instance
-     */
-    public void append(LanguageObject obj) {
-        if (obj == null) {
-            buffer.append(UNDEFINED);
-        } else {
-            visitNode(obj);
-        }
-    }
     
 	public String getTranslatedSQL() {
 		if(buffer == null || buffer.length()==0) {

@@ -83,7 +83,7 @@ public class SolrQueryExecution implements ResultSetExecution {
 
 		// add query Solr response fields
 		for (DerivedColumn field : fieldList) {
-			params.addField(this.visitor.getShortName((field.toString())));
+			params.addField(visitor.getShortName((field.toString())));
 		}
 		
 		//set Solr Query
