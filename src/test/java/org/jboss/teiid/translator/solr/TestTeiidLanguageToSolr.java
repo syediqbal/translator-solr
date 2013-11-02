@@ -26,100 +26,162 @@ import org.teiid.translator.solr.execution.SolrQueryExecution;
 import org.teiid.translator.solr.execution.SolrSQLHierarchyVistor;
 import org.teiid.cdk.api.TranslationUtility;
 
-
 @SuppressWarnings("nls")
 public class TestTeiidLanguageToSolr {
-	
+
 	private TransformationMetadata metadata;
 	private SolrExecutionFactory translator;
 	private TranslationUtility utility;
-	
-	private QueryMetadataInterface setUp(String ddl, String vdbName, String modelName) throws Exception {
-		
+
+	private QueryMetadataInterface setUp(String ddl, String vdbName,
+			String modelName) throws Exception {
+
 		this.translator = new SolrExecutionFactory();
 		this.translator.start();
-		
-		//MetadataFactory mf = new MetadataFactory("", 1, "", SystemMetadata.getInstance().getRuntimeTypeMap(), new Properties(), "");
-		
+
+		// MetadataFactory mf = new MetadataFactory("", 1, "",
+		// SystemMetadata.getInstance().getRuntimeTypeMap(), new Properties(),
+		// "");
+
 		metadata = RealMetadataFactory.fromDDL(ddl, vdbName, modelName);
 		this.utility = new TranslationUtility(metadata);
-		
+
 		return metadata;
 	}
 
-//	private void createFakeMetadata(MetadataFactory mf) {
-//
-//		Table example = mf.addTable("example");
-//		Column id = mf.addColumn("price", TypeFacility.RUNTIME_NAMES.FLOAT,
-//				example);
-//		Column name = mf.addColumn("weight", TypeFacility.RUNTIME_NAMES.FLOAT,
-//				example);
-//		Column age = mf.addColumn("popularity",
-//				TypeFacility.RUNTIME_NAMES.INTEGER, example);
-//	}
+	// private void createFakeMetadata(MetadataFactory mf) {
+	//
+	// Table example = mf.addTable("example");
+	// Column id = mf.addColumn("price", TypeFacility.RUNTIME_NAMES.FLOAT,
+	// example);
+	// Column name = mf.addColumn("weight", TypeFacility.RUNTIME_NAMES.FLOAT,
+	// example);
+	// Column age = mf.addColumn("popularity",
+	// TypeFacility.RUNTIME_NAMES.INTEGER, example);
+	// }
 
-	
-	private String getTranslation(String sql) throws IOException, Exception{
+	private String getTranslation(String sql) throws IOException, Exception {
 		Select select = (Select)getCommand(sql);
-		SolrSQLHierarchyVistor visitor = new SolrSQLHierarchyVistor(this.utility.createRuntimeMetadata());
+		SolrSQLHierarchyVistor visitor = new SolrSQLHierarchyVistor(
+				this.utility.createRuntimeMetadata());
 
-		visitor.visitNode(select);		
-		System.out.println(visitor.getTranslatedSQL());		
-//		Assert.assertEquals(expectedSolrOutput, visitor.getParams().getFields());
+		visitor.visitNode(select);
+		System.out.println(visitor.getTranslatedSQL());
 		return visitor.getTranslatedSQL();
 
 	}
-	
 
 	public Command getCommand(String sql) throws IOException, Exception {
-		
-		  CommandBuilder builder = new CommandBuilder(setUp(ObjectConverterUtil.convertFileToString(UnitTestUtil.getTestDataFile("exampleTBL.dll")), "exampleVDB", "exampleModel"));
-		  return builder.getCommand(sql);
-		
-	} 
+
+		CommandBuilder builder = new CommandBuilder(setUp(
+				ObjectConverterUtil.convertFileToString(UnitTestUtil
+						.getTestDataFile("exampleTBL.dll")), "exampleVDB",
+				"exampleModel"));
+		return builder.getCommand(sql);
+
+	}
 
 	@Test
-	public void testSelectColumns() throws Exception {
-		
-		  
-		//column test, all columns translates to price, weight and popularity
-		//Assert.assertEquals(expectedSolrOutput, visitor.getParams().getFields());  
+	public void testSelectStar() throws Exception {
+
+		// column test, all columns translates to price, weight and popularity
 		Assert.assertEquals(getTranslation("select * from example"), "*:*");
-		  testTranslation("select price from example", "price");
-		  
-		  //test multi-tables columns
-		  //testTranslation(sql, expectedSolrOutput);
-		 
+
+	}
+
+	@Test
+	public void testSelectColumn() throws Exception {
+		Assert.assertEquals(
+				getTranslation("select price,weight,popularity from example"), "*:*");
+	}
+
+	@Test
+	public void testSelectFrom() throws Exception {
+	}
+
+	@Test
+	public void testSelectFromJoin() throws Exception {
+	}
+
+	@Test
+	public void testSelectWhereEQ() throws Exception {
+		Assert.assertEquals(
+				getTranslation("select price,weight,popularity from example where price=1"),
+				"price:1.0");
+	}
+	//only need to preform LT bc SOLR does not handle strict <,> only <=,>=
+	@Test
+	public void testSelectWhereGT() throws Exception {
+		Assert.assertEquals(
+				getTranslation("select price,weight,popularity from example where price>1"),
+				"price:[1.0 TO *]");
+	}
+	//only need to preform LT bc SOLR does not handle strict <,> only <=,>=
+	@Test
+	public void testSelectWhereGE() throws Exception {
+		Assert.assertEquals(
+				getTranslation("select price,weight,popularity from example where price>=1"),
+				"price:[1.0 TO *]");
+	}
+	//only need to preform LT bc SOLR does not handle strict <,> only <=,>=
+	@Test
+	public void testSelectWhereLT() throws Exception {
+		Assert.assertEquals(
+				getTranslation("select price,weight,popularity from example where price<1"),
+				"price:[* TO 1.0]");
+	}
+	//only need to preform LT bc SOLR does not handle strict <,> only <=,>=
+	@Test
+	public void testSelectWhereLE() throws Exception {
+		Assert.assertEquals(
+				getTranslation("select price,weight,popularity from example where price<=1"),
+				"price:[* TO 1.0]");
 	}
 	@Test
-	public void testSelectFrom() throws Exception {}
+	public void testSelectWhereNEQ() throws Exception {
+		Assert.assertEquals(
+				getTranslation("select price,weight,popularity from example where price!=1"),
+				"NOT price:1.0");
+	}
 	@Test
-	public void testSelectFromJoin() throws Exception {}
+	public void testSelectWhenOr() throws Exception {
+	}
+
 	@Test
-	public void testSelectWhen() throws Exception {}
+	public void testSelectWhenLike() throws Exception {
+	}
+
 	@Test
-	public void testSelectWhenOr() throws Exception {}
+	public void testSelectWhenNot() throws Exception {
+	}
+
 	@Test
-	public void testSelectWhenLike() throws Exception {}
+	public void testSelectWhenIn() throws Exception {
+	}
+
 	@Test
-	public void testSelectWhenNot() throws Exception {}
+	public void testSelectWhenAndOr() throws Exception {
+	}
+
 	@Test
-	public void testSelectWhenIn() throws Exception {}
+	public void testSelectWhenAnd() throws Exception {
+	}
+
 	@Test
-	public void testSelectWhenAndOr() throws Exception {}
+	public void testSelectGroupBy() throws Exception {
+	}
+
 	@Test
-	public void testSelectWhenAnd() throws Exception {}
-	@Test
-	public void testSelectGroupBy() throws Exception {}
-	@Test
-	public void testSelectWhenOrderBy() throws Exception {}
+	public void testSelectWhenOrderBy() throws Exception {
+	}
+
 	@Test
 	public void testSelectWhenComparison() throws Exception {
-//		=
-//		<
-//		>
-//		<=
-//		>=
-//		!=
+		// =
+		// <
+		// >
+		// <=
+		// >=
+		// !=
 	}
 }

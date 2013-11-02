@@ -120,11 +120,9 @@ public class SolrExecutionFactory extends
 	 * @Override public boolean supportsOrderBy() { return true; }
 	 */
 
-	/*
-	 * TODO
-	 * 
-	 * @Override public boolean supportsCompareCriteriaEquals() { return true; }
-	 */
+	 
+	  @Override public boolean supportsCompareCriteriaEquals() { return true; }
+	 
 
 	/*
 	 * @Override public boolean supportsInCriteria() { return true; }
