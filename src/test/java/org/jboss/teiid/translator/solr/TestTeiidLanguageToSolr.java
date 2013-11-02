@@ -145,6 +145,9 @@ public class TestTeiidLanguageToSolr {
 	}
 	@Test
 	public void testSelectWhenOr() throws Exception {
+		Assert.assertEquals(
+				getTranslation("select price,weight,popularity from example where price=1 and weight > 5"),
+				"price:1.0 AND weight:[5 TO *]");
 	}
 
 	@Test

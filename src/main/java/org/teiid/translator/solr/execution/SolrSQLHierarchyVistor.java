@@ -13,6 +13,7 @@ import org.teiid.language.Like;
 import org.teiid.language.NamedTable;
 import org.teiid.language.Not;
 import org.teiid.language.SQLConstants;
+import org.teiid.language.SQLConstants.Reserved;
 import org.teiid.language.Select;
 import org.teiid.language.With;
 import org.teiid.language.SQLConstants.Tokens;
@@ -142,6 +143,14 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 	public void visit(AndOr obj) {
 		// TODO Auto-generated method stub
 		super.visit(obj);
+		switch (obj.getOperator()) {
+		case AND:
+			buffer.append(Tokens.SPACE).append(Reserved.AND).append(Tokens.SPACE);
+		case OR:
+			buffer.append(Tokens.SPACE).append(Reserved.OR).append(Tokens.SPACE);
+			break;
+		}
+		System.out.println(obj.getOperator());
 	}
 
 	@Override
