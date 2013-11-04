@@ -1,0 +1,4 @@
+translator-solr
+===============
+
+Solr Translator
