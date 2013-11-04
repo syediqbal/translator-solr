@@ -252,11 +252,11 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 //		System.out.println("\t\t\tend Not visit");
 //	}
 
-	@Override
-	public void visit(With obj) {
-		// TODO work on visit With Method
-		super.visit(obj);
-	}
+//	@Override
+//	public void visit(With obj) {
+//		// TODO work on visit With Method
+//		super.visit(obj);
+//	}
 
 	private String formatSolrQuery(String solrQuery) {
 
