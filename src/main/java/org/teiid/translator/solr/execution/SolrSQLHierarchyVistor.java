@@ -47,6 +47,7 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 	public void visit(Select obj) {
 		// TODO Auto-generated method stub
 		super.visit(obj);
+		System.out.println("\tstart select visitor: ");
 		if (obj.getFrom() != null && !obj.getFrom().isEmpty()) {
 			NamedTable table = (NamedTable) obj.getFrom().get(0);
 
@@ -61,12 +62,11 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 			// }
 			// }
 		}
-
 		// //if there isn't a where clause then get everything
 		// if(obj.getWhere() == null){
 		// buffer.append("*:*");
 		// }
-
+		// visitNode(obj.getWhere());
 		fieldNameList = obj.getDerivedColumns();
 		// System.out.println(obj.getDerivedColumns()); //testing
 		// add query fields
@@ -74,6 +74,8 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 		// params.setFields(getShortName(field.toString()));
 		// // System.out.println(params.getFields());
 		// }
+		System.out.println("where clause: " + obj.getWhere());
+		System.out.println("\tend select visitor: ");
 	}
 
 	/**
@@ -107,17 +109,16 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 	@Override
 	public void visit(Comparison obj) {
 		// TODO Auto-generated method stub
-		super.visit(obj);
+		// super.visit(obj);
 		LogManager.logInfo(
 				"Parsing compound criteria. Current query string is: ",
 				buffer.toString());
+//		System.out.println("\t\tstart comparison visit");
 		String lhs = getShortName(obj.getLeftExpression().toString());
 		Expression rhs = obj.getRightExpression();
-		System.out.println("lhs: " + lhs.toString());
-		System.out.println("operator: " + obj.getOperator().toString());
-		;
-		System.out.println("rhs: " + rhs.toString());
-		;
+//		System.out.print("\t\t\tlhs: " + obj.getLeftExpression().toString());
+//		System.out.print("  operator: " + obj.getOperator().toString());
+//		System.out.println("  rhs: " + obj.getRightExpression().toString());
 		if (lhs != null) {
 			switch (obj.getOperator()) {
 			case EQ:
@@ -129,28 +130,68 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 				break;
 			case LE:
 			case LT:
-				buffer.append(lhs).append(":[* TO").append(Tokens.SPACE).append(rhs.toString()).append("]");
+				buffer.append(lhs).append(":[* TO").append(Tokens.SPACE)
+						.append(rhs.toString()).append("]");
 				break;
 			case GE:
 			case GT:
-				buffer.append(lhs).append(":[").append(rhs.toString()).append(" TO *]");
+				buffer.append(lhs).append(":[").append(rhs.toString())
+						.append(" TO *]");
 				break;
 			}
 		}
+
+		// if(obj.getOperator() !=null)
+		// {
+		// switch (obj.getOperator()) {
+		// case AND:
+		// buffer.append(Tokens.SPACE).append(Reserved.AND).append(Tokens.SPACE);
+		// case OR:
+		// buffer.append(Tokens.SPACE).append(Reserved.OR).append(Tokens.SPACE);
+		// break;
+		// }
+		//
+		// }
+		System.out.println("\t\tend comparison visit");
 	}
 
 	@Override
 	public void visit(AndOr obj) {
 		// TODO Auto-generated method stub
-		super.visit(obj);
+		// super.visit(obj);
+//		System.out.println("\t\tstart andor visit");
+//		System.out.print("\t\t\tlhs: " + obj.getLeftCondition().toString());
+//		System.out.print("  operator: " + obj.getOperator().toString());
+//		System.out.println("  rhs: " + obj.getRightCondition().toString());
+
+		// prepare statement
+		buffer.append(Tokens.LPAREN);
+		buffer.append(Tokens.LPAREN);
+
+		// walk left node
+		super.visitNode(obj.getLeftCondition());
+
+		buffer.append(Tokens.RPAREN);
+
 		switch (obj.getOperator()) {
 		case AND:
-			buffer.append(Tokens.SPACE).append(Reserved.AND).append(Tokens.SPACE);
+			buffer.append(Tokens.SPACE).append(Reserved.AND)
+					.append(Tokens.SPACE);
+			break;
 		case OR:
-			buffer.append(Tokens.SPACE).append(Reserved.OR).append(Tokens.SPACE);
+			buffer.append(Tokens.SPACE).append(Reserved.OR)
+					.append(Tokens.SPACE);
 			break;
 		}
-		System.out.println(obj.getOperator());
+		
+		buffer.append(Tokens.LPAREN);
+		
+		//walk right node
+		super.visitNode(obj.getRightCondition());
+		buffer.append(Tokens.RPAREN);
+		buffer.append(Tokens.RPAREN);
+		
+//		System.out.println("\t\tend andor");
 	}
 
 	@Override
@@ -202,38 +243,6 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 		} else {
 			return buffer.toString();
 		}
+
 	}
-	// /**
-	// * Simple utility to append a list of language objects to the current
-	// buffer
-	// * by creating a comma-separated list.
-	// * @param items a list of LanguageObjects
-	// */
-	// protected void append(List<? extends LanguageObject> items) {
-	// if (items != null && items.size() != 0) {
-	// append(items.get(0));
-	// for (int i = 1; i < items.size(); i++) {
-	// buffer.append(Tokens.COMMA)
-	// .append(Tokens.SPACE);
-	// append(items.get(i));
-	// }
-	// }
-	// }
-	//
-	// /**
-	// * Simple utility to append an array of language objects to the current
-	// buffer
-	// * by creating a comma-separated list.
-	// * @param items an array of LanguageObjects
-	// */
-	// protected void append(LanguageObject[] items) {
-	// if (items != null && items.length != 0) {
-	// append(items[0]);
-	// for (int i = 1; i < items.length; i++) {
-	// buffer.append(Tokens.COMMA)
-	// .append(Tokens.SPACE);
-	// append(items[i]);
-	// }
-	// }
-	// }
 }
