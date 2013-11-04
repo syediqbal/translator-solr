@@ -26,6 +26,10 @@ import org.teiid.translator.solr.execution.SolrQueryExecution;
 import org.teiid.translator.solr.execution.SolrSQLHierarchyVistor;
 import org.teiid.cdk.api.TranslationUtility;
 
+/**
+ * @author student
+ *
+ */
 @SuppressWarnings("nls")
 public class TestTeiidLanguageToSolr {
 
@@ -61,12 +65,12 @@ public class TestTeiidLanguageToSolr {
 	// }
 
 	private String getSolrTranslation(String sql) throws IOException, Exception {
-		Select select = (Select)getCommand(sql);
+		Select select = (Select) getCommand(sql);
 		SolrSQLHierarchyVistor visitor = new SolrSQLHierarchyVistor(
 				this.utility.createRuntimeMetadata());
-System.out.println("\n\nstart visitor"); 
+		System.out.println("\n\nstart visitor");
 		visitor.visit(select);
-		System.out.println("end visitor"); 
+		System.out.println("end visitor");
 		return visitor.getTranslatedSQL();
 
 	}
@@ -80,69 +84,76 @@ System.out.println("\n\nstart visitor");
 		return builder.getCommand(sql);
 
 	}
+/*
+	@Test
+	public void testSelectStar() throws Exception {
 
-//	@Test
-//	public void testSelectStar() throws Exception {
-//
-//		// column test, all columns translates to price, weight and popularity
-//		Assert.assertEquals(getSolrTranslation("select * from example"), "*:*");
-//
-//	}
-//
-//	@Test
-//	public void testSelectColumn() throws Exception {
-//		Assert.assertEquals(
-//				getSolrTranslation("select price,weight,popularity from example"), "*:*");
-//	}
-//
-//	@Test
-//	public void testSelectFrom() throws Exception {
-//	}
-//
-//	@Test
-//	public void testSelectFromJoin() throws Exception {
-//	}
-//
-//	@Test
-//	public void testSelectWhereEQ() throws Exception {
-//		Assert.assertEquals(
-//				getSolrTranslation("select price,weight,popularity from example where price=1"),
-//				"price:1.0");
-//	}
-//	//only need to preform LT bc SOLR does not handle strict <,> only <=,>=
-//	@Test
-//	public void testSelectWhereGT() throws Exception {
-//		Assert.assertEquals(
-//				getSolrTranslation("select price,weight,popularity from example where price>1"),
-//				"price:[1.0 TO *]");
-//	}
-//	//only need to preform LT bc SOLR does not handle strict <,> only <=,>=
-//	@Test
-//	public void testSelectWhereGE() throws Exception {
-//		Assert.assertEquals(
-//				getSolrTranslation("select price,weight,popularity from example where price>=1"),
-//				"price:[1.0 TO *]");
-//	}
-//	//only need to preform LT bc SOLR does not handle strict <,> only <=,>=
-//	@Test
-//	public void testSelectWhereLT() throws Exception {
-//		Assert.assertEquals(
-//				getSolrTranslation("select price,weight,popularity from example where price<1"),
-//				"price:[* TO 1.0]");
-//	}
-//	//only need to preform LT bc SOLR does not handle strict <,> only <=,>=
-//	@Test
-//	public void testSelectWhereLE() throws Exception {
-//		Assert.assertEquals(
-//				getSolrTranslation("select price,weight,popularity from example where price<=1"),
-//				"price:[* TO 1.0]");
-//	}
-//	@Test
-//	public void testSelectWhereNEQ() throws Exception {
-//		Assert.assertEquals(
-//				getSolrTranslation("select price,weight,popularity from example where price!=1"),
-//				"NOT price:1.0");
-//	}
+		// column test, all columns translates to price, weight and popularity
+		Assert.assertEquals(getSolrTranslation("select * from example"), "*:*");
+
+	}
+
+	@Test
+	public void testSelectColumn() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example"),
+				"*:*");
+	}
+
+	@Test
+	public void testSelectFrom() throws Exception {
+	}
+
+	@Test
+	public void testSelectFromJoin() throws Exception {
+	}
+
+	@Test
+	public void testSelectWhereEQ() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where price=1"),
+				"price:1.0");
+	}
+
+	// only need to preform LT bc SOLR does not handle strict <,> only <=,>=
+	@Test
+	public void testSelectWhereGT() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where price>1"),
+				"price:[1.0 TO *]");
+	}
+
+	// only need to preform LT bc SOLR does not handle strict <,> only <=,>=
+	@Test
+	public void testSelectWhereGE() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where price>=1"),
+				"price:[1.0 TO *]");
+	}
+
+	// only need to preform LT bc SOLR does not handle strict <,> only <=,>=
+	@Test
+	public void testSelectWhereLT() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where price<1"),
+				"price:[* TO 1.0]");
+	}
+
+	// only need to preform LT bc SOLR does not handle strict <,> only <=,>=
+	@Test
+	public void testSelectWhereLE() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where price<=1"),
+				"price:[* TO 1.0]");
+	}
+
+	@Test
+	public void testSelectWhereNEQ() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where price!=1"),
+				"NOT price:1.0");
+	}
+
 	@Test
 	public void testSelectWhenOr() throws Exception {
 		Assert.assertEquals(
@@ -150,54 +161,87 @@ System.out.println("\n\nstart visitor");
 				"((price:1.0) OR (weight:[5.0 TO *]))");
 	}
 
-//	@Test
-//	public void testSelectWhenOr() throws Exception {
-//		Assert.assertEquals(
-//				getSolrTranslation("select price,weight,popularity from example where weight < 5 AND price=1 or weight > 5 and popularity>2 or popularity < 1"),
-//				"price:1.0 OR weight:[5 TO *]");
-//	}
-//	@Test
-//	public void testSelectWhenOr() throws Exception {
-//		Assert.assertEquals(
-//				getSolrTranslation("select price,weight,popularity from example where (weight < 5 OR price=1) AND weight > 5"),
-//				"price:1.0 OR weight:[5 TO *]");
-//	}
+	@Test
+	public void testSelectWhenAnd() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where price=1 AND weight >5"),
+				"((price:1.0) AND (weight:[5.0 TO *]))");
+	}
 
+	@Test
+	public void testSelectWhenAndOr() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where weight > 5 AND price=1 or weight > 5"),
+				"((((weight:[5.0 TO *]) AND (price:1.0))) OR (weight:[5.0 TO *]))");
+	}
+
+	@Test
+	public void testSelectWhenAndOrOr() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where weight > 5 AND price=1 or weight > 5 or popularity < 1"),
+				"((((weight:[5.0 TO *]) AND (price:1.0))) OR (((weight:[5.0 TO *]) OR (popularity:[* TO 1]))))");
+	}
+
+	@Test
+	public void testSelectWhenLike() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where name like '%sung'"),
+				"name:*sung");
+	}
+
+	@Test
+	public void testSelectWhenLikeAnd() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where name like '%sung' and price=1"),
+				"((name:*sung) AND (price:1.0))");
+	}
+
+	@Test
+	public void testSelectWhenOrLikeAnd() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where popularity < 1 Or name like '%sung' and price=1"),
+				"((popularity:[* TO 1]) OR (((name:*sung) AND (price:1.0))))");
+	}
+*/
 //	@Test
-//	public void testSelectWhenLike() throws Exception {
+//	public void testSelectWhenInEmpty() throws Exception {
+//		Assert.assertEquals(
+//				getSolrTranslation("select price,weight,popularity from example where name in ()"),
+//				"((popularity:[* TO 1]) OR (((name:*sung) AND (price:1.0))))");
 //	}
-//
 //	@Test
-//	public void testSelectWhenNot() throws Exception {
+//	public void testSelectWhenInString() throws Exception {
+//		Assert.assertEquals(
+//				getSolrTranslation("select price,weight,popularity from example where name in ('1','2','3')"),
+//				"((popularity:[* TO 1]) OR (((name:*sung) AND (price:1.0))))");
 //	}
-//
-//	@Test
-//	public void testSelectWhenIn() throws Exception {
-//	}
-//
-//	@Test
-//	public void testSelectWhenAndOr() throws Exception {
-//	}
-//
-//	@Test
-//	public void testSelectWhenAnd() throws Exception {
-//	}
-//
-//	@Test
-//	public void testSelectGroupBy() throws Exception {
-//	}
-//
-//	@Test
-//	public void testSelectWhenOrderBy() throws Exception {
-//	}
-//
-//	@Test
-//	public void testSelectWhenComparison() throws Exception {
-//		// =
-//		// <
-//		// >
-//		// <=
-//		// >=
-//		// !=
-//	}
+//	
+	@Test
+	public void testSelectWhenIn() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where popularity in (1,2,3)"),
+				"popularity:(1 OR 2 OR 3)");
+	}
+	// @Test
+	// public void testSelectWhenNot() throws Exception {
+	// }
+	//
+
+	// @Test
+	// public void testSelectGroupBy() throws Exception {
+	// }
+	//
+	// @Test
+	// public void testSelectWhenOrderBy() throws Exception {
+	// }
+	//
+	// @Test
+	// public void testSelectWhenComparison() throws Exception {
+	// // =
+	// // <
+	// // >
+	// // <=
+	// // >=
+	// // !=
+	// }
 }

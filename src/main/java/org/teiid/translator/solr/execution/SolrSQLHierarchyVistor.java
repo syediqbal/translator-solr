@@ -1,5 +1,6 @@
 package org.teiid.translator.solr.execution;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
@@ -46,8 +47,8 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 	@Override
 	public void visit(Select obj) {
 		// TODO Auto-generated method stub
+		System.out.println("\tstart select visitor: ");		
 		super.visit(obj);
-		System.out.println("\tstart select visitor: ");
 		if (obj.getFrom() != null && !obj.getFrom().isEmpty()) {
 			NamedTable table = (NamedTable) obj.getFrom().get(0);
 
@@ -108,17 +109,15 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 	 */
 	@Override
 	public void visit(Comparison obj) {
-		// TODO Auto-generated method stub
-		// super.visit(obj);
 		LogManager.logInfo(
 				"Parsing compound criteria. Current query string is: ",
 				buffer.toString());
-//		System.out.println("\t\tstart comparison visit");
+		System.out.println("\t\tstart comparison visit");
 		String lhs = getShortName(obj.getLeftExpression().toString());
 		Expression rhs = obj.getRightExpression();
-//		System.out.print("\t\t\tlhs: " + obj.getLeftExpression().toString());
-//		System.out.print("  operator: " + obj.getOperator().toString());
-//		System.out.println("  rhs: " + obj.getRightExpression().toString());
+		System.out.print("\t\t\tlhs: " + obj.getLeftExpression().toString());
+		System.out.print("  operator: " + obj.getOperator().toString());
+		System.out.println("  rhs: " + obj.getRightExpression().toString());
 		if (lhs != null) {
 			switch (obj.getOperator()) {
 			case EQ:
@@ -141,28 +140,15 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 			}
 		}
 
-		// if(obj.getOperator() !=null)
-		// {
-		// switch (obj.getOperator()) {
-		// case AND:
-		// buffer.append(Tokens.SPACE).append(Reserved.AND).append(Tokens.SPACE);
-		// case OR:
-		// buffer.append(Tokens.SPACE).append(Reserved.OR).append(Tokens.SPACE);
-		// break;
-		// }
-		//
-		// }
 		System.out.println("\t\tend comparison visit");
 	}
 
 	@Override
 	public void visit(AndOr obj) {
-		// TODO Auto-generated method stub
-		// super.visit(obj);
-//		System.out.println("\t\tstart andor visit");
-//		System.out.print("\t\t\tlhs: " + obj.getLeftCondition().toString());
-//		System.out.print("  operator: " + obj.getOperator().toString());
-//		System.out.println("  rhs: " + obj.getRightCondition().toString());
+		System.out.println("\t\tstart andor visit");
+		System.out.print("\t\t\tlhs: " + obj.getLeftCondition().toString());
+		System.out.print("  operator: " + obj.getOperator().toString());
+		System.out.println("  rhs: " + obj.getRightCondition().toString());
 
 		// prepare statement
 		buffer.append(Tokens.LPAREN);
@@ -191,36 +177,92 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 		buffer.append(Tokens.RPAREN);
 		buffer.append(Tokens.RPAREN);
 		
-//		System.out.println("\t\tend andor");
+		System.out.println("\t\tend andor");
 	}
 
 	@Override
 	public void visit(In obj) {
-		// TODO Auto-generated method stub
-		super.visit(obj);
+		// TODO work on visit In Method
+		
+//		super.visit(obj);
+		Expression rhsExpression;
+		System.out.println("\t\t\tstart In visit");
+		System.out.println("\t\t\t\tIn test: " + obj.toString());
+		System.out.print("\t\t\t\tlhs: " + obj.getLeftExpression());
+//		System.out.print("  operator: " + obj.getEscapeCharacter().toString());
+		System.out.println("  rhs: " + obj.getRightExpressions().toString());
+		String lhs = getShortName(obj.getLeftExpression().toString());
+		
+		//start solr expression
+		buffer.append(lhs).append(Tokens.COLON).append(Tokens.LPAREN);
+		
+		List<Expression> rhs = obj.getRightExpressions();
+		Iterator<Expression> i = rhs.iterator();
+		
+		while(i.hasNext())
+		{
+			rhsExpression = i.next();
+			//append rhs side as we iterates
+			buffer.append(rhsExpression.toString());
+			
+			if(i.hasNext())
+			{				
+				buffer.append(Tokens.SPACE).append(Reserved.OR).append(Tokens.SPACE);
+			}
+			
+		}
+		buffer.append(Tokens.RPAREN);
+		
+//		for(Expression expression : rhs)
+//		{
+//			buffer.append(expression.toString())
+//			if(rhs..append(Tokens.SPACE).
+//			System.out.println("\t\t\t\trhs expression:" + expression.toString());
+//		}
+//		
+//		String rhs = formatSolrQuery(obj.getRightExpressions().toString());
+//		
+//		buffer.append(lhs).append(Tokens.COLON).append(rhs);
+		System.out.println("\t\t\tend In visit");
 	}
 
+	
+	/* (non-Javadoc)
+	 * @see org.teiid.language.visitor.HierarchyVisitor#visit(org.teiid.language.Like)
+	 * Description: transforms the like statements into solor syntax
+	 */
 	@Override
 	public void visit(Like obj) {
-		// TODO Auto-generated method stub
-		super.visit(obj);
+
+		System.out.println("\t\t\tstart Like visit");
+		System.out.println("\t\t\t\tlike test: " + obj.toString());
+		System.out.print("\t\t\tlhs: " + obj.getLeftExpression());
+//		System.out.print("  operator: " + obj.getEscapeCharacter().toString());
+		System.out.println("  rhs: " + obj.getRightExpression().toString());
+		
+		String lhs = getShortName(obj.getLeftExpression().toString());
+		String rhs = formatSolrQuery(obj.getRightExpression().toString());
+		
+		buffer.append(lhs).append(Tokens.COLON).append(rhs);
+		System.out.println("\t\t\tend Like visit");
 	}
 
 	@Override
 	public void visit(Not obj) {
-		// TODO Auto-generated method stub
+		// TODO work on visit Not Method
 		super.visit(obj);
 	}
 
 	@Override
 	public void visit(With obj) {
-		// TODO Auto-generated method stub
+		// TODO work on visit With Method
 		super.visit(obj);
 	}
 
 	private String formatSolrQuery(String solrQuery) {
 
 		solrQuery = solrQuery.replace("%", "*");
+		solrQuery = solrQuery.replace("'","");
 		// solrQuery = solrQuery.replace("_", "?");
 
 		return solrQuery;
