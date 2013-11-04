@@ -202,26 +202,29 @@ public class TestTeiidLanguageToSolr {
 				getSolrTranslation("select price,weight,popularity from example where popularity < 1 Or name like '%sung' and price=1"),
 				"((popularity:[* TO 1]) OR (((name:*sung) AND (price:1.0))))");
 	}
-*/
-//	@Test
-//	public void testSelectWhenInEmpty() throws Exception {
-//		Assert.assertEquals(
-//				getSolrTranslation("select price,weight,popularity from example where name in ()"),
-//				"((popularity:[* TO 1]) OR (((name:*sung) AND (price:1.0))))");
-//	}
-//	@Test
-//	public void testSelectWhenInString() throws Exception {
-//		Assert.assertEquals(
-//				getSolrTranslation("select price,weight,popularity from example where name in ('1','2','3')"),
-//				"((popularity:[* TO 1]) OR (((name:*sung) AND (price:1.0))))");
-//	}
-//	
+
+	@Test
+	public void testSelectWhenInString() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where name in ('1','2','3')"),
+				"name:('1' OR '2' OR '3')");
+	}
+	
 	@Test
 	public void testSelectWhenIn() throws Exception {
 		Assert.assertEquals(
 				getSolrTranslation("select price,weight,popularity from example where popularity in (1,2,3)"),
 				"popularity:(1 OR 2 OR 3)");
 	}
+	
+	@Test
+	public void testSelectWhenOrInAnd() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where weight = 1 or popularity in (1,2,3) and price = 1"),
+				"((weight:1.0) OR (((popularity:(1 OR 2 OR 3)) AND (price:1.0))))");
+	}
+*/		
+	
 	// @Test
 	// public void testSelectWhenNot() throws Exception {
 	// }

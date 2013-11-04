@@ -181,16 +181,9 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 	}
 
 	@Override
-	public void visit(In obj) {
-		// TODO work on visit In Method
+	public void visit(In obj) {	
 		
-//		super.visit(obj);
 		Expression rhsExpression;
-		System.out.println("\t\t\tstart In visit");
-		System.out.println("\t\t\t\tIn test: " + obj.toString());
-		System.out.print("\t\t\t\tlhs: " + obj.getLeftExpression());
-//		System.out.print("  operator: " + obj.getEscapeCharacter().toString());
-		System.out.println("  rhs: " + obj.getRightExpressions().toString());
 		String lhs = getShortName(obj.getLeftExpression().toString());
 		
 		//start solr expression
@@ -213,17 +206,6 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 		}
 		buffer.append(Tokens.RPAREN);
 		
-//		for(Expression expression : rhs)
-//		{
-//			buffer.append(expression.toString())
-//			if(rhs..append(Tokens.SPACE).
-//			System.out.println("\t\t\t\trhs expression:" + expression.toString());
-//		}
-//		
-//		String rhs = formatSolrQuery(obj.getRightExpressions().toString());
-//		
-//		buffer.append(lhs).append(Tokens.COLON).append(rhs);
-		System.out.println("\t\t\tend In visit");
 	}
 
 	
