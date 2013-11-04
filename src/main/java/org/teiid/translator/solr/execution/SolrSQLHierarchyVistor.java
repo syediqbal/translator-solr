@@ -186,6 +186,10 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 		Expression rhsExpression;
 		String lhs = getShortName(obj.getLeftExpression().toString());
 		
+		if (obj.isNegated()){
+			buffer.append(Reserved.NOT).append(Tokens.SPACE);
+		}
+		
 		//start solr expression
 		buffer.append(lhs).append(Tokens.COLON).append(Tokens.LPAREN);
 		
@@ -225,15 +229,28 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 		String lhs = getShortName(obj.getLeftExpression().toString());
 		String rhs = formatSolrQuery(obj.getRightExpression().toString());
 		
+		System.out.println(obj.isNegated());
+		if (obj.isNegated()){
+			buffer.append(Reserved.NOT).append(Tokens.SPACE);
+		}
 		buffer.append(lhs).append(Tokens.COLON).append(rhs);
 		System.out.println("\t\t\tend Like visit");
 	}
 
-	@Override
-	public void visit(Not obj) {
-		// TODO work on visit Not Method
-		super.visit(obj);
-	}
+//	@Override
+//	public void visit(Not obj) {
+//		System.out.println("\t\t\tstart Not visit");
+//		System.out.println("\t\t\t\tnot test: " + obj.toString());
+//		System.out.print("\t\t\tcriteria: " + obj.getCriteria());
+////		System.out.print("  operator: " + obj.getEscapeCharacter().toString());
+////		System.out.println("  rhs: " + obj.getRightExpression().toString());
+////		
+////		String lhs = getShortName(obj.getLeftExpression().toString());
+////		String rhs = formatSolrQuery(obj.getRightExpression().toString());
+////		
+////		buffer.append(lhs).append(Tokens.COLON).append(rhs);
+//		System.out.println("\t\t\tend Not visit");
+//	}
 
 	@Override
 	public void visit(With obj) {

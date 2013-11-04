@@ -84,7 +84,7 @@ public class TestTeiidLanguageToSolr {
 		return builder.getCommand(sql);
 
 	}
-/*
+
 	@Test
 	public void testSelectStar() throws Exception {
 
@@ -115,6 +115,20 @@ public class TestTeiidLanguageToSolr {
 				"price:1.0");
 	}
 
+	@Test
+	public void testSelectWhereNE() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where price!=1"),
+				"NOT price:1.0");
+	}
+	
+	@Test
+	public void testSelectWhereNEString() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where name!='test'"),
+				"NOT name:'test'");
+	}
+	
 	// only need to preform LT bc SOLR does not handle strict <,> only <=,>=
 	@Test
 	public void testSelectWhereGT() throws Exception {
@@ -160,7 +174,18 @@ public class TestTeiidLanguageToSolr {
 				getSolrTranslation("select price,weight,popularity from example where price=1 or weight >5"),
 				"((price:1.0) OR (weight:[5.0 TO *]))");
 	}
-
+@Test
+	public void testSelectWhenNotOr() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where Not (price=1 or weight >5)"),
+				"((NOT price:1.0) AND (weight:[* TO 5.0]))");
+	}	
+@Test
+public void testSelectWhenNotOrString() throws Exception {
+	Assert.assertEquals(
+			getSolrTranslation("select price,weight,popularity from example where Not (name like '%sung' or weight >5)"),
+			"((NOT name:*sung) AND (weight:[* TO 5.0]))");
+}
 	@Test
 	public void testSelectWhenAnd() throws Exception {
 		Assert.assertEquals(
@@ -202,7 +227,14 @@ public class TestTeiidLanguageToSolr {
 				getSolrTranslation("select price,weight,popularity from example where popularity < 1 Or name like '%sung' and price=1"),
 				"((popularity:[* TO 1]) OR (((name:*sung) AND (price:1.0))))");
 	}
-
+	
+	@Test
+	public void testSelectWhenOrNotLikeAnd() throws Exception {
+		Assert.assertEquals(
+				getSolrTranslation("select price,weight,popularity from example where popularity < 1 Or name not like '%sung' and price=1"),
+				"((popularity:[* TO 1]) OR (((NOT name:*sung) AND (price:1.0))))");
+	}
+	
 	@Test
 	public void testSelectWhenInString() throws Exception {
 		Assert.assertEquals(
@@ -223,12 +255,25 @@ public class TestTeiidLanguageToSolr {
 				getSolrTranslation("select price,weight,popularity from example where weight = 1 or popularity in (1,2,3) and price = 1"),
 				"((weight:1.0) OR (((popularity:(1 OR 2 OR 3)) AND (price:1.0))))");
 	}
-*/		
-	
-	// @Test
-	// public void testSelectWhenNot() throws Exception {
-	// }
-	//
+		
+	 @Test
+	 public void testSelectWhenNotIn() throws Exception {
+			Assert.assertEquals(
+					getSolrTranslation("select price,weight,popularity from example where  popularity not in (1,2,3)"),
+					"NOT popularity:(1 OR 2 OR 3)");
+	 }
+	 @Test
+	 public void testSelectWhenNotAnd() throws Exception {
+			Assert.assertEquals(
+					getSolrTranslation("select price,weight,popularity from example where weight = 1 AND not popularity in (1,2,3)"),
+					"((weight:1.0) AND (NOT popularity:(1 OR 2 OR 3)))");
+	 }
+	 @Test
+	 public void testSelectWhenAndNotAndAndLike() throws Exception {
+			Assert.assertEquals(
+					getSolrTranslation("select price,weight,popularity from example where weight = 1 AND not (popularity in (1,2,3) and name like '%sung')"),
+					"((weight:1.0) AND (((NOT popularity:(1 OR 2 OR 3)) OR (NOT name:*sung))))");
+	 }
 
 	// @Test
 	// public void testSelectGroupBy() throws Exception {

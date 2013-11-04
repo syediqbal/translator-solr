@@ -122,6 +122,12 @@ public class SolrExecutionFactory extends
 
 	 
 	  @Override public boolean supportsCompareCriteriaEquals() { return true; }
+
+	@Override
+	public boolean supportsNotCriteria() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 	 
 
 	/*
