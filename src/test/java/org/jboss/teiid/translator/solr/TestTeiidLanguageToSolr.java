@@ -62,7 +62,7 @@ public class TestTeiidLanguageToSolr {
 
 		CommandBuilder builder = new CommandBuilder(setUp(
 				ObjectConverterUtil.convertFileToString(UnitTestUtil
-						.getTestDataFile("exampleTBL.dll")), "exampleVDB",
+						.getTestDataFile("exampleTBL.ddl")), "exampleVDB",
 				"exampleModel"));
 		return builder.getCommand(sql);
 
