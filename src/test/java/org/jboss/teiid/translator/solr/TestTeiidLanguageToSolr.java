@@ -43,34 +43,17 @@ public class TestTeiidLanguageToSolr {
 		this.translator = new SolrExecutionFactory();
 		this.translator.start();
 
-		// MetadataFactory mf = new MetadataFactory("", 1, "",
-		// SystemMetadata.getInstance().getRuntimeTypeMap(), new Properties(),
-		// "");
-
 		metadata = RealMetadataFactory.fromDDL(ddl, vdbName, modelName);
 		this.utility = new TranslationUtility(metadata);
 
 		return metadata;
 	}
 
-	// private void createFakeMetadata(MetadataFactory mf) {
-	//
-	// Table example = mf.addTable("example");
-	// Column id = mf.addColumn("price", TypeFacility.RUNTIME_NAMES.FLOAT,
-	// example);
-	// Column name = mf.addColumn("weight", TypeFacility.RUNTIME_NAMES.FLOAT,
-	// example);
-	// Column age = mf.addColumn("popularity",
-	// TypeFacility.RUNTIME_NAMES.INTEGER, example);
-	// }
-
 	private String getSolrTranslation(String sql) throws IOException, Exception {
 		Select select = (Select) getCommand(sql);
 		SolrSQLHierarchyVistor visitor = new SolrSQLHierarchyVistor(
 				this.utility.createRuntimeMetadata());
-		System.out.println("\n\nstart visitor");
 		visitor.visit(select);
-		System.out.println("end visitor");
 		return visitor.getTranslatedSQL();
 
 	}
@@ -275,21 +258,15 @@ public void testSelectWhenNotOrString() throws Exception {
 					"((weight:1.0) AND (((NOT popularity:(1 OR 2 OR 3)) OR (NOT name:*sung))))");
 	 }
 
-	// @Test
-	// public void testSelectGroupBy() throws Exception {
-	// }
-	//
-	// @Test
-	// public void testSelectWhenOrderBy() throws Exception {
-	// }
-	//
-	// @Test
-	// public void testSelectWhenComparison() throws Exception {
-	// // =
-	// // <
-	// // >
-	// // <=
-	// // >=
-	// // !=
-	// }
+	/* TODO testSelectGroupBy
+	 * @Test
+	 public void testSelectGroupBy() throws Exception {
+	 }*/
+	
+	/* TODO testSelectWhenOrderBy
+	 * @Test
+	 public void testSelectWhenOrderBy() throws Exception {
+	 }*/
+	
+
 }

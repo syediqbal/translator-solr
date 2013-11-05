@@ -1,6 +1,5 @@
 package org.teiid.translator.solr;
 
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -26,6 +25,7 @@ import org.teiid.translator.TranslatorException;
 
 /**
  * Creates a execution factory
+ * 
  * @author Jason Marley
  * 
  */
@@ -105,50 +105,40 @@ public class SolrExecutionFactory extends
 		}
 
 	}
-	/*
-	 * @Override public void getMetadata(MetadataFactory metadataFactory,
-	 * SolrQueryExecution conn) throws TranslatorException {
-	 * SolrMetadataProcessor processor = new
-	 * SolrMetadataProcessor(metadataFactory, conn.keyspaceInfo());
-	 * processor.processMetadata(); }
-	 * 
-	 * @Override
-	 */
+
 	/*
 	 * TODO
 	 * 
-	 * @Override public boolean supportsOrderBy() { return true; }
+	 * @Override public boolean supportsOrderBy() { return true; }	
+	 * /*
+	 * 
 	 */
 
-	 
-	  @Override public boolean supportsCompareCriteriaEquals() { return true; }
+	@Override
+	public boolean supportsCompareCriteriaEquals() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsInCriteria() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsRowLimit() {
+		return true;
+	}
 
 	@Override
 	public boolean supportsNotCriteria() {
-		// TODO Auto-generated method stub
 		return true;
 	}
-	 
 
-	/*
-	 * @Override public boolean supportsInCriteria() { return true; }
-	 */
 
-	/*
-	 * @Override public boolean supportsRowLimit() { return true; }
-	 */
 
-	/*
-	 * @Override public boolean supportsNotCriteria() { return true; }
-	 */
-
-	/*
-	 * @Override public boolean supportsCompareCriteriaOrdered() { return true;
-	 * }
-	 */
-
-	/*
-	 * @Override public boolean supportsLikeCriteria() { return true; }
-	 */
+	@Override
+	public boolean supportsLikeCriteria() {
+		return true;
+	}
 
 }

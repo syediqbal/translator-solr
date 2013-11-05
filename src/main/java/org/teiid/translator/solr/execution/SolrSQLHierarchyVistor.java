@@ -46,37 +46,14 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 
 	@Override
 	public void visit(Select obj) {
-		// TODO Auto-generated method stub
-		System.out.println("\tstart select visitor: ");		
+		
 		super.visit(obj);
 		if (obj.getFrom() != null && !obj.getFrom().isEmpty()) {
 			NamedTable table = (NamedTable) obj.getFrom().get(0);
-
-			// testing
-			// //check if select all case
-			// if(table.getMetadataObject().getColumns() != null){
-			// if (obj.getDerivedColumns().size() ==
-			// table.getMetadataObject().getColumns().size()){
-			// buffer.append("*");
-			// }else{
-			// append(obj.getDerivedColumns());
-			// }
-			// }
 		}
-		// //if there isn't a where clause then get everything
-		// if(obj.getWhere() == null){
-		// buffer.append("*:*");
-		// }
-		// visitNode(obj.getWhere());
+
 		fieldNameList = obj.getDerivedColumns();
-		// System.out.println(obj.getDerivedColumns()); //testing
-		// add query fields
-		// for (DerivedColumn field : fieldNameList) {
-		// params.setFields(getShortName(field.toString()));
-		// // System.out.println(params.getFields());
-		// }
-		System.out.println("where clause: " + obj.getWhere());
-		System.out.println("\tend select visitor: ");
+
 	}
 
 	/**
@@ -112,12 +89,8 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 		LogManager.logInfo(
 				"Parsing compound criteria. Current query string is: ",
 				buffer.toString());
-		System.out.println("\t\tstart comparison visit");
 		String lhs = getShortName(obj.getLeftExpression().toString());
 		Expression rhs = obj.getRightExpression();
-		System.out.print("\t\t\tlhs: " + obj.getLeftExpression().toString());
-		System.out.print("  operator: " + obj.getOperator().toString());
-		System.out.println("  rhs: " + obj.getRightExpression().toString());
 		if (lhs != null) {
 			switch (obj.getOperator()) {
 			case EQ:
@@ -140,15 +113,10 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 			}
 		}
 
-		System.out.println("\t\tend comparison visit");
 	}
 
 	@Override
 	public void visit(AndOr obj) {
-		System.out.println("\t\tstart andor visit");
-		System.out.print("\t\t\tlhs: " + obj.getLeftCondition().toString());
-		System.out.print("  operator: " + obj.getOperator().toString());
-		System.out.println("  rhs: " + obj.getRightCondition().toString());
 
 		// prepare statement
 		buffer.append(Tokens.LPAREN);
@@ -177,7 +145,6 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 		buffer.append(Tokens.RPAREN);
 		buffer.append(Tokens.RPAREN);
 		
-		System.out.println("\t\tend andor");
 	}
 
 	@Override
@@ -219,12 +186,6 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 	 */
 	@Override
 	public void visit(Like obj) {
-
-		System.out.println("\t\t\tstart Like visit");
-		System.out.println("\t\t\t\tlike test: " + obj.toString());
-		System.out.print("\t\t\tlhs: " + obj.getLeftExpression());
-//		System.out.print("  operator: " + obj.getEscapeCharacter().toString());
-		System.out.println("  rhs: " + obj.getRightExpression().toString());
 		
 		String lhs = getShortName(obj.getLeftExpression().toString());
 		String rhs = formatSolrQuery(obj.getRightExpression().toString());
@@ -234,29 +195,7 @@ public class SolrSQLHierarchyVistor extends HierarchyVisitor {
 			buffer.append(Reserved.NOT).append(Tokens.SPACE);
 		}
 		buffer.append(lhs).append(Tokens.COLON).append(rhs);
-		System.out.println("\t\t\tend Like visit");
 	}
-
-//	@Override
-//	public void visit(Not obj) {
-//		System.out.println("\t\t\tstart Not visit");
-//		System.out.println("\t\t\t\tnot test: " + obj.toString());
-//		System.out.print("\t\t\tcriteria: " + obj.getCriteria());
-////		System.out.print("  operator: " + obj.getEscapeCharacter().toString());
-////		System.out.println("  rhs: " + obj.getRightExpression().toString());
-////		
-////		String lhs = getShortName(obj.getLeftExpression().toString());
-////		String rhs = formatSolrQuery(obj.getRightExpression().toString());
-////		
-////		buffer.append(lhs).append(Tokens.COLON).append(rhs);
-//		System.out.println("\t\t\tend Not visit");
-//	}
-
-//	@Override
-//	public void visit(With obj) {
-//		// TODO work on visit With Method
-//		super.visit(obj);
-//	}
 
 	private String formatSolrQuery(String solrQuery) {
 
