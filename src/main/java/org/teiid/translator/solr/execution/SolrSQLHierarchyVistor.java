@@ -21,7 +21,7 @@ import org.teiid.language.SQLConstants.Tokens;
 import org.teiid.language.visitor.HierarchyVisitor;
 import org.teiid.logging.LogManager;
 import org.teiid.metadata.RuntimeMetadata;
-import org.teiid.query.parser.Token;
+//import org.teiid.query.parser.Token;
 
 /**
  * @author student

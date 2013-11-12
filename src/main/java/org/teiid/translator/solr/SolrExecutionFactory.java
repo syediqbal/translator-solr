@@ -42,8 +42,8 @@ public class SolrExecutionFactory extends
 	@Override
 	public void start() throws TranslatorException {
 		super.start();
-		LogManager.logTrace(LogConstants.CTX_CONNECTOR,
-				"Solr Executionfactory Started");
+//		LogManager.logTrace(LogConstants.CTX_CONNECTOR,
+//				"Solr Executionfactory Started");
 	}
 
 	@Override
