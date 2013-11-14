@@ -47,7 +47,8 @@
 			<groupId>org.jboss.teiid</groupId>
 
 			<artifactId>teiid-api</artifactId>
-			<version>8.6.0.Alpha3-SNAPSHOT</version>
+			<version>8.6.0.Beta2-SNAPSHOT</version>
+			 <scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -55,14 +56,15 @@
 			<groupId>org.jboss.teiid</groupId>
 
 			<artifactId>teiid-common-core</artifactId>
-			<version>8.6.0.Alpha3-SNAPSHOT</version>
-
+			<version>8.6.0.Beta2-SNAPSHOT</version>
+             <scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.resource</groupId>
 			<artifactId>connector-api</artifactId>
 			<version>1.5</version>
+			 <scope>provided</scope>
 		</dependency>
 
 	</dependencies>
